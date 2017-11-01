@@ -31,6 +31,14 @@
   </form>
 </div>
 
+{% if unknown_user %}
+<div class="row pt-5">
+  <p class="alert alert-error">
+    <strong>Error</strong>: the user <i>{{ user_name|e }}</i> doesn't exist on our DB.
+  </p>
+</div>
+{% endif %}
+
 {% if favorite_problems %}
 <div class="row pt-5">
   <h1>Recommended Problems</h1>

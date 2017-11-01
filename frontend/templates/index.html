@@ -2,9 +2,14 @@
 {% block content %}
 
 <div class="container">
+
+<div class="row pt-3">
   <p class="lead">
     次にFav★するべき <a href="https://yukicoder.me">Yukicoder</a> のいろいろが見付かるサイトです (非公式)
   </p>
+</div>
+
+<div class="row">
   <ul>
     <li>「この問題をFavした人はこの問題もFavしています」</li>
     <li>「この提出をFavした人はこの提出もFavしています」</li>
@@ -12,16 +17,41 @@
     <li>「この問題を解いた人はこの問題も解いています」</li>
     <li>「これらの問題を解いた人は次にこれらの問題を解くとよいでしょう」</li>
   </ul>
+</div>
 
+<div class="row">
   <form method="GET" action="/">
-    <div class="input-group col-lg-6 offset-lg-3">
+    <div class="input-group">
       <span class="input-group-addon">@</span>
-      <input type="text" name="username" class="form-control" placeholder="yukicoder username">
+      <input type="text" name="name" class="form-control" placeholder="yukicoder username">
       <span class="input-group-btn">
         <button class="btn btn-primary" type="submit">Go!</button>
       </span>
     </div>
   </form>
+</div>
+
+{% if favorite_problems %}
+<div class="row pt-5">
+  <h1>Recommended Problems</h1>
+  <table class="table table-condensed table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>hoge</th>
+        <th>hoge</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for problem in favorite_problems %}
+      <tr>
+        <td>{{ problem.foo|e }}</td>
+        <td>{{ problem.bar|e }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
 
 </div>
 

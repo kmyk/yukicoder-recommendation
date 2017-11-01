@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+  <p class="lead">
+    次にFav★するべき <a href="https://yukicoder.me">Yukicoder</a> のいろいろが見付かるサイトです (非公式)
+  </p>
+  <ul>
+    <li>「この問題をFavした人はこの問題もFavしています」</li>
+    <li>「この提出をFavした人はこの提出もFavしています」</li>
+    <li>「このWikiをFavした人はこのWikiもFavしています」</li>
+    <li>「この問題を解いた人はこの問題も解いています」</li>
+    <li>「これらの問題を解いた人は次にこれらの問題を解くとよいでしょう」</li>
+  </ul>
+
+  <form method="GET" action="/">
+    <div class="input-group col-lg-6 offset-lg-3">
+      <span class="input-group-addon">@</span>
+      <input type="text" name="username" class="form-control" placeholder="yukicoder username">
+      <span class="input-group-btn">
+        <button class="btn btn-primary" type="submit">Go!</button>
+      </span>
+    </div>
+  </form>
+
+</div>
+
+{% endblock %}

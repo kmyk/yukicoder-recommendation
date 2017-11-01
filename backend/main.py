@@ -40,11 +40,14 @@ if __name__ == '__main__':
     connection = get_db_handler(path=args.db_path)
     cursor = connection.cursor()
     session = requests.Session()
+    failure_count = 0
     for user_id in ( args.user_id or itertools.count() ):
         if fetch_user(user_id, session=session, cursor=cursor):
             update_user(user_id, session=session, cursor=cursor)
+            failure_count = 0
         else:
-            if not args.user_id and user_id >= 2000:
+            failure_count += 1
+            if failure_count >= 5 and not args.user_id:
                 break
         connection.commit()
         time.sleep(args.wait)

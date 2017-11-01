@@ -10,8 +10,14 @@
 </div>
 
 <div class="row">
+  <p> できた: </p>
   <ul>
     <li>「この問題をFavした人はこの問題もFavしています」</li>
+  </ul>
+</div>
+<div class="row">
+  <p> まだ: </p>
+  <ul>
     <li>「この提出をFavした人はこの提出もFavしています」</li>
     <li>「このWikiをFavした人はこのWikiもFavしています」</li>
     <li>「この問題を解いた人はこの問題も解いています」</li>
@@ -23,7 +29,7 @@
   <form method="GET" action="/">
     <div class="input-group">
       <span class="input-group-addon">@</span>
-      <input type="text" name="name" class="form-control" placeholder="yukicoder username">
+      <input type="text" name="name" class="form-control" placeholder="yukicoder username" {% if user_name %} value={{ user_name }} {% endif %} >
       <span class="input-group-btn">
         <button class="btn btn-primary" type="submit">Go!</button>
       </span>
@@ -31,15 +37,15 @@
   </form>
 </div>
 
-{% if unknown_user %}
+{% if error_message %}
 <div class="row pt-5">
   <p class="alert alert-error">
-    <strong>Error</strong>: the user <i>{{ user_name|e }}</i> doesn't exist on our DB.
+    <strong>Error</strong>: {{ error_message|safe }}
   </p>
 </div>
 {% endif %}
 
-{% if favorite_problems %}
+{% if recommended_problems %}
 <div class="row pt-5">
   <h1>Recommended Problems</h1>
   <table class="table table-condensed table-bordered table-hover">
@@ -50,10 +56,10 @@
       </tr>
     </thead>
     <tbody>
-      {% for problem in favorite_problems %}
+      {% for problem in recommended_problems %}
       <tr>
-        <td>{{ problem.foo|e }}</td>
-        <td>{{ problem.bar|e }}</td>
+        <td>{{ problem.link|safe }}</td>
+        <td>{{ problem.score }}</td>
       </tr>
       {% endfor %}
     </tbody>

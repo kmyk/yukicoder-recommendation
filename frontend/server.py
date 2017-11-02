@@ -31,24 +31,26 @@ def get_recommended_problems(user_id):
         raise AppError('このユーザーはまだどの問題もふぁぼっていません。なにも判断基準がないのでお手上げだよ')
     cur.execute('SELECT t1.user_id FROM favorite_problems t1 INNER JOIN favorite_problems t2 ON t1.problem_no = t2.problem_no WHERE t2.user_id = ?', ( user_id, ))
     user_dict = collections.Counter()
-    for user_id, in cur.fetchall():
-        user_dict[user_id] += 1
+    for similar_user_id, in cur.fetchall():
+        user_dict[similar_user_id] += 1
     problem_dict = collections.Counter()
-    for user_id, user_score in user_dict.items():
-        cur.execute('SELECT problem_no FROM favorite_problems WHERE user_id = ?', ( user_id, ))
+    for similar_user_id, user_score in user_dict.items():
+        cur.execute('SELECT problem_no FROM favorite_problems WHERE user_id = ?', ( similar_user_id, ))
         for problem_no, in cur.fetchall():
             if problem_no not in favorite_problems:
                 problem_dict[problem_no] += 1
     problem_dict = list(problem_dict.items())
     problem_dict.sort(key=lambda x: x[1], reverse=True)
-    if not problem_dict:
-        raise AppError('おすすめはいくつかあったけど全部解かれちゃってたよ。ごめんね')
     result = []
-    for problem_no, score in problem_dict[: 10]:
-        cur.execute('SELECT name FROM problems WHERE no = ?', ( problem_no, ))
-        problem_name, = cur.fetchone()
-        link = '''<a href="https://yukicoder.me/problems/no/%d">No %d. %s</a>''' % (problem_no, problem_no, flask.escape(problem_name))
-        result += [ { 'link': link, 'score': str(score) } ]
+    for problem_no, score in problem_dict[: 32]:
+        cur.execute('SELECT 1 FROM submissions WHERE user_id = ? AND problem_no = ? AND is_ac = 1', ( user_id, problem_no, ))
+        if cur.fetchone() is None:
+            cur.execute('SELECT name FROM problems WHERE no = ?', ( problem_no, ))
+            problem_name, = cur.fetchone()
+            link = '''<a href="https://yukicoder.me/problems/no/%d">No %d. %s</a>''' % (problem_no, problem_no, flask.escape(problem_name))
+            result += [ { 'link': link, 'score': str(score) } ]
+    if not result:
+        raise AppError('おすすめはいくつかあったけど全部解かれちゃってたよ。ごめんね')
     return result
 
 @app.route('/')

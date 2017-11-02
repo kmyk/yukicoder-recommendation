@@ -12,9 +12,9 @@ CREATE TABLE problems (
 CREATE TABLE submissions (
     id INTEGER PRIMARY KEY,
     problem_no INTEGER NOT NULL,
-    user_id INTEGER NOT NULL
+    user_id INTEGER NOT NULL,
+    is_ac INTEGER
 );
-CREATE INDEX index_user_id ON submissions (user_id);
 CREATE TABLE wikipages (
     name TEXT PRIMARY KEY
 );

@@ -3,16 +3,26 @@
 
 import flask
 import MySQLdb.cursors
+import requests
 import os
 import collections
 
 app = flask.Flask(__name__)
 
+def get_custom_metadata(key, default=None):
+    url = 'http://metadata.google.internal/computeMetadata/v1/project/attributes/%s' % key
+    try:
+        resp = requests.get(url, headers={ 'Metadata-Flavor': 'Google' })
+        resp.raise_for_status()
+        return resp.content.decode()
+    except requests.exceptions.RequestException:
+        return default
+
 config = {
-    'db_host': os.environ.get('DB_HOST', 'localhost'),
-    'db_port': int(os.environ.get('DB_PORT', '3306')),
-    'db_user': os.environ.get('DB_USER', 'root'),
-    'db_password': os.environ.get('DB_PASSWORD', ''),
+    'db_host':         get_custom_metadata('db-host',     os.environ.get('DB_HOST',     'localhost')),
+    'db_port':     int(get_custom_metadata('db-port',     os.environ.get('DB_PORT',     '3306'))),
+    'db_user':         get_custom_metadata('db-user',     os.environ.get('DB_USER',     'root')),
+    'db_password':     get_custom_metadata('db-password', os.environ.get('DB_PASSWORD', '')),
 }
 
 class AppError(RuntimeError):

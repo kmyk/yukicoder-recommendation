@@ -9,20 +9,12 @@ import collections
 
 app = flask.Flask(__name__)
 
-def get_custom_metadata(key, default=None):
-    url = 'http://metadata.google.internal/computeMetadata/v1/project/attributes/%s' % key
-    try:
-        resp = requests.get(url, headers={ 'Metadata-Flavor': 'Google' })
-        resp.raise_for_status()
-        return resp.content.decode()
-    except requests.exceptions.RequestException:
-        return default
-
 config = {
-    'db_host':         get_custom_metadata('db-host',     os.environ.get('DB_HOST',     'localhost')),
-    'db_port':     int(get_custom_metadata('db-port',     os.environ.get('DB_PORT',     '3306'))),
-    'db_user':         get_custom_metadata('db-user',     os.environ.get('DB_USER',     'root')),
-    'db_password':     get_custom_metadata('db-password', os.environ.get('DB_PASSWORD', '')),
+    'db_connection_name': os.environ.get('DB_CONNECTION_NAME'),
+    'db_host':            os.environ.get('DB_HOST',     'localhost'),
+    'db_port':        int(os.environ.get('DB_PORT',     '3306')),
+    'db_user':            os.environ.get('DB_USER',     'root'),
+    'db_password':        os.environ.get('DB_PASSWORD', ''),
 }
 
 class AppError(RuntimeError):
@@ -30,16 +22,19 @@ class AppError(RuntimeError):
 
 def get_db_handler():
     if not hasattr(flask.g, 'db'):
-        flask.g.db = MySQLdb.connect(
-            host    = config['db_host'],
-            port    = config['db_port'],
-            user    = config['db_user'],
-            passwd  = config['db_password'],
-            db      = 'yukireco',
-            charset = 'utf8mb4',
-            cursorclass = MySQLdb.cursors.DictCursor,
-            autocommit = True,
-        )
+        kwargs = {
+            'user': config['db_user'],
+            'passwd': config['db_password'],
+            'db': 'yukireco',
+            'charset': 'utf8mb4',
+            'cursorclass': MySQLdb.cursors.DictCursor,
+        }
+        if config['db_connection_name'] is not None:
+            kwargs['unix_socket'] = os.path.join('/cloudsql', config['db_connection_name'])
+        else:
+            kwargs['host'] = config['db_host']
+            kwargs['port'] = config['db_port']
+        flask.g.db = MySQLdb.connect(**kwargs)
     cur = flask.g.db.cursor()
     cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")
     return cur

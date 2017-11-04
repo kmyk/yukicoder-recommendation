@@ -1,0 +1,24 @@
+runtime: python
+env: flex
+entrypoint: gunicorn -b :$PORT server:app
+
+runtime_config:
+  python_version: 3
+
+threadsafe: true
+
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1
+
+
+includes:
+- secret.yaml
+
+# $ cat secret.yaml
+# beta_settings:
+#   cloud_sql_instances: DB_CONNECTION_NAME
+# env_variables:
+#   db-connection-name: DB_CONNECTION_NAME
+#   db-user: DB_USER
+#   db-password: DB_PASSWORD

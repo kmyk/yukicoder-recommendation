@@ -36,13 +36,17 @@
     <thead>
       <tr>
         <th>問題</th>
+        <th>レベル</th>
+        <th>解いた人数</th>
         <th>評価値</th>
       </tr>
     </thead>
     <tbody>
       {% for problem in recommended_problems %}
       <tr>
-        <td>{{ problem.link|safe }}</td>
+        <td><a href="{{ problem.link }}">{{ problem.name }}</a></td>
+        <td>{{ problem.level|safe }}</td>
+        <td>{{ problem.solved }}</td>
         <td>{{ problem.score }}</td>
       </tr>
       {% endfor %}

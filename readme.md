@@ -7,6 +7,8 @@
 
 Yukicoder(<https://yukicoder.me/>)上のFav情報からおすすめの問題を提案してくれるwepアプリです
 
+![screenshot](https://user-images.githubusercontent.com/2203128/32404658-6dccbb40-c197-11e7-9dad-af1553d81969.png)
+
 ## memo
 
 -   frontend

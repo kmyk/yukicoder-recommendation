@@ -19,6 +19,10 @@ Yukicoder(<https://yukicoder.me/>)上のFav情報からおすすめの問題を�
     -   fav情報やAC情報をwebからscrapingしてDBに投げる
     -   localにて手動で叩く
     -   ここの自動化をする元気はもうない
+-   管理
+    -   GAEへの反映: `cd frontend ; gcloud app deploy`
+    -   手元でpreview: `DB_HOST=$DB_HOST DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD py3 frontend/server.py`
+    -   手元でscrapingして鯖にinsert: `DB_HOST=$DB_HOST DB_USER=$DB_USER DB_PASSWORD=$DB_PASSWORD py3 backend/main.py`
 -   他
     -   機械学習+webで後に残るものを作りたかった
     -   開発は1日だったのにdeployに3日かかった

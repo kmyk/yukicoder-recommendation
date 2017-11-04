@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 failure_count = 0
             else:
                 failure_count += 1
-                if failure_count >= 5 and not args.args:
+                if failure_count >= 20 and not args.args:
                     break
             time.sleep(args.wait)
 

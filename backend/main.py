@@ -27,7 +27,7 @@ def get_db_handler():
         autocommit = True,
     )
     cur = conn.cursor()
-    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")
+    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")  # use kamipo TRADITIONAL
     return cur
 
 def fetch_user(user_id, session, cursor):

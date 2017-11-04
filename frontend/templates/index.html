@@ -5,24 +5,8 @@
 
 <div class="row pt-3">
   <p class="lead">
-    次にFavするべき <a href="https://yukicoder.me">Yukicoder</a> のいろいろが見付かるサイトです (非公式)
+    次にFavするべき <a href="https://yukicoder.me">Yukicoder</a> の問題が見付かるサイトです (非公式)
   </p>
-</div>
-
-<div class="row">
-  <p> できた: </p>
-  <ul>
-    <li>「この問題をFavした人はこの問題もFavしています」</li>
-  </ul>
-</div>
-<div class="row">
-  <p> まだ: </p>
-  <ul>
-    <li>「この提出をFavした人はこの提出もFavしています」</li>
-    <li>「このWikiをFavした人はこのWikiもFavしています」</li>
-    <li>「この問題を解いた人はこの問題も解いています」</li>
-    <li>「これらの問題を解いた人は次にこれらの問題を解くとよいでしょう」</li>
-  </ul>
 </div>
 
 <div class="row">
@@ -47,18 +31,22 @@
 
 {% if recommended_problems %}
 <div class="row pt-5">
-  <h1>Recommended Problems</h1>
+  <h2>「この問題をFavした人はこの問題もFavしています」</h2>
   <table class="table table-condensed table-bordered table-hover">
     <thead>
       <tr>
         <th>問題</th>
+        <th>レベル</th>
+        <th>解いた人数</th>
         <th>評価値</th>
       </tr>
     </thead>
     <tbody>
       {% for problem in recommended_problems %}
       <tr>
-        <td>{{ problem.link|safe }}</td>
+        <td><a href="{{ problem.link }}">{{ problem.name }}</a></td>
+        <td>{{ problem.level|safe }}</td>
+        <td>{{ problem.solved }}</td>
         <td>{{ problem.score }}</td>
       </tr>
       {% endfor %}

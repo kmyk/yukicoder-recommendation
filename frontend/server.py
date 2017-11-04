@@ -3,7 +3,6 @@
 
 import flask
 import MySQLdb.cursors
-import requests
 import os
 import collections
 
@@ -36,7 +35,7 @@ def get_db_handler():
             kwargs['port'] = config['db_port']
         flask.g.db = MySQLdb.connect(**kwargs)
     cur = flask.g.db.cursor()
-    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")
+    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")  # use kamipo TRADITIONAL
     return cur
 
 def get_user_id(user_name):
@@ -47,9 +46,20 @@ def get_user_id(user_name):
         raise AppError('<i>%s</i>という名前のユーザーはいませんでした。typoしてませんか？' % flask.escape(user_name))
     return user_id['id']
 
+def render_star(level):
+    if level is None:
+        return '-'
+    s = ''
+    for _ in range(int(level.split('.')[0])):
+        s += '<i class="fa fa-star"></i>'
+    if level.endswith('.5'):
+        s += '<i class="fa fa-star-half-full"></i>'
+    return s
+
 def get_recommended_problems(user_id):
     cur = get_db_handler()
 
+    # Fav情報の取得 (一括)
     favorite_problems = collections.defaultdict(list)
     inverse_favorite_problems = collections.defaultdict(list)
     cur.execute('SELECT user_id, problem_no FROM favorite_problems')
@@ -57,15 +67,18 @@ def get_recommended_problems(user_id):
         favorite_problems[row['user_id']] += [ row['problem_no'] ]
         inverse_favorite_problems[row['problem_no']] += [ row['user_id'] ]
 
+    # 指定ユーザのものだけ抽出
     if user_id not in favorite_problems:
         raise AppError('このユーザーはまだどの問題もふぁぼっていません。なにも判断基準がないのでお手上げだよ')
     target_favorite_problems = set(favorite_problems[user_id])
 
+    # 類似ユーザの重み付き列挙
     similar_users = collections.Counter()
     for problem_no in target_favorite_problems:
         for similar_user_id in inverse_favorite_problems[problem_no]:
             similar_users[problem_no] += 1
 
+    # おすすめ問題の列挙
     recommended_problems = collections.Counter()
     for similar_user_id, user_score in similar_users.items():
         for problem_no in favorite_problems[similar_user_id]:
@@ -74,23 +87,34 @@ def get_recommended_problems(user_id):
     recommended_problems = list(recommended_problems.items())
     recommended_problems.sort(key=lambda x: x[1], reverse=True)
 
+    # AC情報の取得 (対象ユーザ)
     target_accepted_problems = set()
     cur.execute('SELECT DISTINCT problem_no FROM submissions WHERE user_id = %s AND is_ac = 1', ( user_id, ))
     for row in cur.fetchall():
         target_accepted_problems.add(row['problem_no'])
 
+    # 問題情報の取得 (一括)
     problems = {}
-    cur.execute('SELECT no, name FROM problems')
+    cur.execute('SELECT * FROM problems')
     for row in cur.fetchall():
-        problems[row['no']] = { 'name': row['name'] }
+        problems[row['no']] = dict(row)
+        print(row)
 
+    # 出力の構成
     result = []
     for problem_no, score in recommended_problems:
         if problem_no not in target_accepted_problems:
             problem_name = problems[problem_no]['name']
-            link = '''<a href="https://yukicoder.me/problems/no/%d">No %d. %s</a>''' % (problem_no, problem_no, flask.escape(problem_name))
-            result += [ { 'link': link, 'score': str(score) } ]
-
+            solved = problems[problem_no]['solved']
+            if solved is None:
+                solved = '-'
+            result += [ {
+                'name': 'No %d. %s' % (problem_no, problem_name),
+                'url': 'https://yukicoder.me/problems/no/%d' % problem_no,
+                'level': render_star(problems[problem_no]['level']),
+                'solved': problems[problem_no]['solved'],
+                'score': str(score),
+            } ]
     if not result:
         raise AppError('おすすめはいくつかあったけど全部解かれちゃってたよ。ごめんね')
     return result[: 32]

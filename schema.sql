@@ -6,6 +6,9 @@ CREATE TABLE users (
 CREATE TABLE problems (
     no INTEGER PRIMARY KEY,
     name VARCHAR(191) UNIQUE,
+    level VARCHAR(16),
+    solved INTEGER,
+    writer_id INTEGER,
     INDEX index_name (name)
 ) CHARSET = utf8mb4;
 CREATE TABLE submissions (
@@ -22,21 +25,21 @@ CREATE TABLE wikipages (
 CREATE TABLE favorite_problems (
     user_id INTEGER,
     problem_no INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (problem_no) REFERENCES problems (no),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE,
+    FOREIGN KEY (problem_no) REFERENCES problems (no) ON UPDATE CASCADE,
     PRIMARY KEY (user_id, problem_no)
 ) CHARSET = utf8mb4;
 CREATE TABLE favorite_submissions (
     user_id INTEGER,
     submission_id BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (submission_id) REFERENCES submissions (id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE,
+    FOREIGN KEY (submission_id) REFERENCES submissions (id) ON UPDATE CASCADE,
     PRIMARY KEY (user_id, submission_id)
 ) CHARSET = utf8mb4;
 CREATE TABLE favorite_wikipages (
     user_id INTEGER,
     wikipage_name VARCHAR(191),
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (wikipage_name) REFERENCES wikipages (name),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE,
+    FOREIGN KEY (wikipage_name) REFERENCES wikipages (name) ON UPDATE CASCADE,
     PRIMARY KEY (user_id, wikipage_name)
 ) CHARSET = utf8mb4;

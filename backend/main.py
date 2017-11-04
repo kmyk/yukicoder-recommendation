@@ -27,7 +27,7 @@ def get_db_handler():
         autocommit = True,
     )
     cur = conn.cursor()
-    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")
+    cur.execute("SET SESSION sql_mode='TRADITIONAL,NO_AUTO_VALUE_ON_ZERO,ONLY_FULL_GROUP_BY'")  # use kamipo TRADITIONAL
     return cur
 
 def fetch_user(user_id, session, cursor):
@@ -44,7 +44,7 @@ def update_user(user_id, session, cursor):
         problem_no = problem['ナンバー']
         problem_name = problem['問題名']
         print('[*] favorite problem: (%d, %d)' % (user_id, problem_no))
-        cursor.execute('INSERT IGNORE INTO problems VALUES (%s, %s)', ( problem_no, problem_name ))
+        cursor.execute('INSERT IGNORE INTO problems VALUES (%s, %s, NULL, NULL, NULL)', ( problem_no, problem_name ))
         cursor.execute('INSERT IGNORE INTO favorite_problems VALUES (%s, %s)', ( user_id, problem_no ))
 
 def fetch_submissions(page, session, cursor):
@@ -63,17 +63,33 @@ def fetch_submissions(page, session, cursor):
         cursor.execute('SELECT 1 FROM submissions WHERE id = %s', ( submission_id, ))
         if cursor.fetchone() is None:
             cursor.execute('INSERT IGNORE INTO users VALUES (%s, %s)', ( user_id, user_name ))
-            cursor.execute('INSERT IGNORE INTO problems VALUES (%s, %s)', ( problem_no, problem_name ))
+            cursor.execute('INSERT IGNORE INTO problems VALUES (%s, %s, NULL, NULL, NULL)', ( problem_no, problem_name ))
             print('[*] submission: (%d, %d, %d)' % (submission_id, problem_no, user_id))
             cursor.execute('INSERT INTO submissions VALUES (%s, %s, %s, 1)', ( submission_id, problem_no, user_id ))
             num += 1
         den += 1
     return num, den
 
+def update_problems(page, session, cursor):
+    print('[*] update problems: %d' % page)
+    problems = YukicoderService().get_problems(page=page, session=session)
+    if not problems:
+        return False
+    for problem in problems:
+        problem_no = problem['ナンバー']
+        problem_name = problem['問題名']
+        solved = problem['解いた人数']
+        level = problem['レベル']
+        writer_id = int(problem['作問者/url'].split('/')[-1])
+        print('[*] problem:', (problem_no, problem_name, level, solved, writer_id))
+        cursor.execute('INSERT IGNORE INTO problems VALUES (%s, %s, NULL, NULL, NULL)', ( problem_no, problem_name ))
+        cursor.execute('UPDATE problems SET name = %s, level = %s, solved = %s, writer_id = %s WHERE no = %s', ( problem_name, level, solved, writer_id, problem_no ))
+    return True
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('what', choices=( 'favorite', 'submission' ))
+    parser.add_argument('what', choices=( 'favorite', 'submission', 'problem' ))
     parser.add_argument('args', nargs='*', type=int)
     parser.add_argument('--wait', type=float, default=1)
     args = parser.parse_args()
@@ -97,5 +113,12 @@ if __name__ == '__main__':
         for page in ( args.args or itertools.count(1) ):
             num, den = fetch_submissions(page=page, session=session, cursor=cursor)
             if (den == 0 or num < den) and not args.args:
+                break
+            time.sleep(args.wait)
+
+    elif args.what == 'problem':
+        for page in ( args.args or itertools.count(1) ):
+            result = update_problems(page=page, session=session, cursor=cursor)
+            if not result and not args.args:
                 break
             time.sleep(args.wait)

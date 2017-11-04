@@ -98,7 +98,6 @@ def get_recommended_problems(user_id):
     cur.execute('SELECT * FROM problems')
     for row in cur.fetchall():
         problems[row['no']] = dict(row)
-        print(row)
 
     # 出力の構成
     result = []
@@ -112,7 +111,7 @@ def get_recommended_problems(user_id):
                 'name': 'No %d. %s' % (problem_no, problem_name),
                 'url': 'https://yukicoder.me/problems/no/%d' % problem_no,
                 'level': render_star(problems[problem_no]['level']),
-                'solved': problems[problem_no]['solved'],
+                'solved': solved,
                 'score': str(score),
             } ]
     if not result:

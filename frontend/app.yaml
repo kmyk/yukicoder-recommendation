@@ -19,6 +19,7 @@ includes:
 # beta_settings:
 #   cloud_sql_instances: DB_CONNECTION_NAME
 # env_variables:
-#   db-connection-name: DB_CONNECTION_NAME
-#   db-user: DB_USER
-#   db-password: DB_PASSWORD
+#   DB_CONNECTION_NAME: DB_CONNECTION_NAME
+#   DB_HOST: DB_HOST
+#   DB_USER: DB_USER
+#   DB_PASSWORD: DB_PASSWORD

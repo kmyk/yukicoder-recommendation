@@ -1,7 +1,8 @@
 # Yukicoder Recommendation
 
--   <https://psyched-oxide-184819.appspot.com/>
--   <https://psyched-oxide-184819.appspot.com/?name=yuki2006>
+-   ttps://psyched-oxide-184819.appspot.com/
+-   ttps://psyched-oxide-184819.appspot.com/?name=yuki2006
+-   作って満足したので鯖は落としました
 
 ## これはなに
 
